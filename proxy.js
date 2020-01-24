@@ -118,6 +118,8 @@ class ProxyCore extends events.EventEmitter {
         httpServerPort: config.port, // the http server port for http proxy
         forceProxyHttps: !!config.forceProxyHttps,
         dangerouslyIgnoreUnauthorized: !!config.dangerouslyIgnoreUnauthorized,
+        currentHosts: this.currentHosts,
+        protocol: this.proxyType === T_TYPE_HTTPS ? 'wss' : 'ws',
       },
       this.proxyRule,
       this.recorder
@@ -271,7 +273,7 @@ class ProxyCore extends events.EventEmitter {
 
           if (self.webServerInstance) {
             const webTip =
-              'web interface started on port ' + self.webServerInstance.webPort;
+              'web interface started on port ' + self.proxyPort;
             logUtil.printLog(color.green(webTip));
           }
 
