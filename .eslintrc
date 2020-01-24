@@ -23,7 +23,10 @@
     "max-len": [0],
     "func-names": [0],
     "no-underscore-dangle": [0],
-    "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
+    "no-unused-vars": [
+      "error",
+      { "vars": "all", "args": "none", "ignoreRestSiblings": false }
+    ],
     "object-shorthand": [0],
     "arrow-body-style": [0],
     "no-new": [0],
@@ -66,7 +69,7 @@
     "no-extra-boolean-cast": [0],
     "no-lonely-if": [0],
     "no-plusplus": [0],
-    "generator-star-spacing": ["error", {"before": true, "after": false}],
+    "generator-star-spacing": ["off", { "before": true, "after": false }],
     "require-yield": [0],
     "arrow-parens": [0],
     "no-template-curly-in-string": [0],

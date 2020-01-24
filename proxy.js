@@ -62,10 +62,10 @@ class ProxyCore extends events.EventEmitter {
       throw new Error('node.js >= v4.x is required for anyproxy');
     } else if (config.forceProxyHttps && !certMgr.ifRootCAFileExists()) {
       logUtil.printLog(
-        'You can run `anyproxy-ca` to generate one root CA and then re-run this command',
+        'You can run `anyproxy-ca` to generate one root CA and then re-run this command'
       );
       throw new Error(
-        'root CA not found. Please run `anyproxy-ca` to generate one first.',
+        'root CA not found. Please run `anyproxy-ca` to generate one first.'
       );
     } else if (this.proxyType === T_TYPE_HTTPS && !config.hostname) {
       throw new Error('hostname is required in https proxy');
@@ -80,7 +80,7 @@ class ProxyCore extends events.EventEmitter {
     ) {
       logUtil.printLog(
         'both "-i(--intercept)" and rule.beforeDealHttpsRequest are specified, the "-i" option will be ignored.',
-        logUtil.T_WARN,
+        logUtil.T_WARN
       );
       config.forceProxyHttps = false;
     }
@@ -100,7 +100,7 @@ class ProxyCore extends events.EventEmitter {
       const rate = parseInt(config.throttle, 10);
       if (rate < 1) {
         throw new Error(
-          'Invalid throttle rate value, should be positive integer',
+          'Invalid throttle rate value, should be positive integer'
         );
       }
       global._throttle = new ThrottleGroup({ rate: 1024 * rate }); // rate - byte/sec
@@ -119,7 +119,7 @@ class ProxyCore extends events.EventEmitter {
         dangerouslyIgnoreUnauthorized: !!config.dangerouslyIgnoreUnauthorized,
       },
       this.proxyRule,
-      this.recorder,
+      this.recorder
     );
   }
 
@@ -158,13 +158,13 @@ class ProxyCore extends events.EventEmitter {
 
     if (self.status !== PROXY_STATUS_INIT) {
       throw new Error(
-        'server status is not PROXY_STATUS_INIT, can not run start()',
+        'server status is not PROXY_STATUS_INIT, can not run start()'
       );
     }
     async.series(
       [
         //creat proxy server
-        function(callback) {
+        callback => {
           if (!this.httpProxyServer) {
             if (self.proxyType === T_TYPE_HTTPS) {
               certMgr.getCertificate(
@@ -178,15 +178,15 @@ class ProxyCore extends events.EventEmitter {
                         key: keyContent,
                         cert: crtContent,
                       },
-                      self.requestHandler.userRequestHandler,
+                      self.requestHandler.userRequestHandler
                     );
                     callback(null);
                   }
-                },
+                }
               );
             } else {
               self.httpProxyServer = http.createServer(
-                self.requestHandler.userRequestHandler,
+                self.requestHandler.userRequestHandler
               );
               callback(null);
             }
@@ -196,16 +196,16 @@ class ProxyCore extends events.EventEmitter {
         },
 
         //handle CONNECT request for https over http
-        function(callback) {
+        callback => {
           self.httpProxyServer.on(
             'connect',
-            self.requestHandler.connectReqHandler,
+            self.requestHandler.connectReqHandler
           );
 
           callback(null);
         },
 
-        function(callback) {
+        callback => {
           wsServerMgr.getWsServer({
             server: self.httpProxyServer,
             connHandler: self.requestHandler.wsHandler,
@@ -218,7 +218,7 @@ class ProxyCore extends events.EventEmitter {
         },
 
         //start proxy server
-        function(callback) {
+        callback => {
           self.httpProxyServer.listen(self.proxyPort);
           callback(null);
         },
@@ -250,7 +250,7 @@ class ProxyCore extends events.EventEmitter {
               }
 
               logUtil.printLog(
-                color.green(`Active rule is: ${ruleSummaryString}`),
+                color.green(`Active rule is: ${ruleSummaryString}`)
               );
             });
           }
@@ -265,7 +265,7 @@ class ProxyCore extends events.EventEmitter {
             error: err,
           });
         }
-      },
+      }
     );
 
     return self;
@@ -312,14 +312,14 @@ class ProxyCore extends events.EventEmitter {
             console.error(error);
             logUtil.printLog(
               `proxy server close FAILED : ${error.message}`,
-              logUtil.T_ERR,
+              logUtil.T_ERR
             );
           } else {
             this.httpProxyServer = null;
 
             this.status = PROXY_STATUS_CLOSED;
             logUtil.printLog(
-              `proxy server closed at ${this.proxyHostName}:${this.proxyPort}`,
+              `proxy server closed at ${this.proxyHostName}:${this.proxyPort}`
             );
           }
           resolve(error);
@@ -349,7 +349,7 @@ class ProxyServer extends ProxyCore {
       {
         recorder,
       },
-      config,
+      config
     );
 
     super(configForCore);
@@ -368,7 +368,7 @@ class ProxyServer extends ProxyCore {
     if (this.proxyWebinterfaceConfig && this.proxyWebinterfaceConfig.enable) {
       this.webServerInstance = new WebInterface(
         this.proxyWebinterfaceConfig,
-        this.recorder,
+        this.recorder
       );
       // start web server
       this.webServerInstance
