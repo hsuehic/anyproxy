@@ -1,5 +1,5 @@
 {
-  "name": "anyproxy",
+  "name": "@shopee/anyproxy",
   "version": "4.1.2",
   "description": "A fully configurable HTTP/HTTPS proxy in Node.js",
   "main": "proxy.js",
