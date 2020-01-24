@@ -57,7 +57,7 @@ class ProxyCore extends events.EventEmitter {
       : T_TYPE_HTTP;
     this.proxyHostName = config.hostname || 'localhost';
     this.recorder = config.recorder;
-    this.currentHosts = [`127.0.0.1:${this.proxyPort}`, `localhost:${this.proxyPort}`, `${this.proxyHostName}:${this.proxyPort}`]
+    this.currentHosts = util.getAllIpAddress().map(ip => `${ip}:${this.proxyPort}`).concat(`localhost:${this.proxyPort}`, `${this.proxyHostName}:${this.proxyPort}`);
 
     if (parseInt(process.versions.node.split('.')[0], 10) < 4) {
       throw new Error('node.js >= v4.x is required for anyproxy');
@@ -393,6 +393,26 @@ class ProxyServer extends ProxyCore {
     this.proxyWebinterfaceConfig = config.webInterface;
     this.recorder = recorder;
     this.webServerInstance = null;
+    this.webServerApp = null;
+  }
+
+
+  /**
+   * Handle http request to this site
+   * @param {http.IncomingMessage} req 
+   * @param {http.ServerResponse} res 
+   */
+  handleUserRequest(req, res) {
+    logUtil.info(`received request to: ${req.method} ${req.url}`);
+    // proxy request start with http(s)://
+    if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
+      if (this.webServerApp) {
+        this.webServerApp(req, res);
+      } else {
+        res.write('Hello world');
+        res.end();
+      }
+    }
   }
 
   start() {
@@ -407,15 +427,8 @@ class ProxyServer extends ProxyCore {
         this.recorder
       );
       // start web server
-      this.webServerInstance
-        .start()
-        // start proxy core
-        .then(() => {
-          super.start();
-        })
-        .catch(e => {
-          this.emit('error', e);
-        });
+      this.webServerApp = this.webServerInstance.getServer();
+      super.start();
     } else {
       super.start();
     }
