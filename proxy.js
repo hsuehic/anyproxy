@@ -242,7 +242,7 @@ class ProxyCore extends events.EventEmitter {
           let ruleSummaryString = '';
           const ruleSummary = this.proxyRule.summary;
           if (ruleSummary) {
-            co(function*() {
+            co(function* () {
               if (typeof ruleSummary === 'string') {
                 ruleSummaryString = ruleSummary;
               } else {
