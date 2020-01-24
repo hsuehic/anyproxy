@@ -146,6 +146,31 @@ class ProxyCore extends events.EventEmitter {
     });
   }
   /**
+   * Handle http request to this site
+   * @param {http.IncomingMessage} req 
+   * @param {http.ServerResponse} res 
+   */
+  handleUserRequest(req, res) {
+    logUtil.info(`received request to: ${req.method} ${req.url}`);
+    // proxy request start with http(s)://
+    if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
+      res.write('Hello world');
+      res.end();
+    }
+  }
+
+  /**
+   * Handle http request to this site
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   */
+  handleProxyRequest(req, res) {
+    const self = this;
+    if (!self.currentHosts.includes(req.headers.host) && !res.finished) {
+      self.requestHandler.userRequestHandler(req, res);
+    }
+  }
+  /**
    * start the proxy server
    *
    * @returns ProxyCore
@@ -179,7 +204,7 @@ class ProxyCore extends events.EventEmitter {
                         key: keyContent,
                         cert: crtContent,
                       },
-                      self.requestHandler.userRequestHandler
+                      self.handleUserRequest.bind(self),
                     );
                     callback(null);
                   }
@@ -187,18 +212,17 @@ class ProxyCore extends events.EventEmitter {
               );
             } else {
               self.httpProxyServer = http.createServer(
-                self.requestHandler.userRequestHandler
+                self.handleUserRequest.bind(self),
               );
               callback(null);
             }
           } else {
-            self.httpProxyServer.on('request', (req, res) => {
-              if (!self.currentHosts.includes(req.host)) {
-                self.requestHandler.userRequestHandler(req, res);
-              }
-            });
             callback(null);
           }
+        },
+        callback => {
+          self.httpProxyServer.on('request', self.handleProxyRequest.bind(self));
+          callback(null);
         },
 
         //handle CONNECT request for https over http
