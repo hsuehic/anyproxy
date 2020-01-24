@@ -48,7 +48,7 @@ class ProxyCore extends events.EventEmitter {
    */
   constructor(config) {
     super();
-    config = config || {};
+    config = config || { port: 8001 };
 
     this.status = PROXY_STATUS_INIT;
     this.proxyPort = config.port;
@@ -57,6 +57,7 @@ class ProxyCore extends events.EventEmitter {
       : T_TYPE_HTTP;
     this.proxyHostName = config.hostname || 'localhost';
     this.recorder = config.recorder;
+    this.currentHosts = [`127.0.0.1:${this.proxyPort}`, `localhost:${this.proxyPort}`, `${this.proxyHostName}:${this.proxyPort}`]
 
     if (parseInt(process.versions.node.split('.')[0], 10) < 4) {
       throw new Error('node.js >= v4.x is required for anyproxy');
@@ -191,6 +192,11 @@ class ProxyCore extends events.EventEmitter {
               callback(null);
             }
           } else {
+            self.httpProxyServer.on('request', (req, res) => {
+              if (!self.currentHosts.includes(req.host)) {
+                self.requestHandler.userRequestHandler(req, res);
+              }
+            });
             callback(null);
           }
         },
@@ -199,7 +205,11 @@ class ProxyCore extends events.EventEmitter {
         callback => {
           self.httpProxyServer.on(
             'connect',
-            self.requestHandler.connectReqHandler
+            (req, socket, head) => {
+              if (!self.currentHosts.includes(req.host)) { // do not proxy requests to this server
+                self.requestHandler.connectReqHandler(req, socket, head);
+              }
+            }
           );
 
           callback(null);
