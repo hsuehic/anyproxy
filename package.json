@@ -1,6 +1,6 @@
 {
   "name": "@shopee/anyproxy",
-  "version": "4.1.5",
+  "version": "4.1.6",
   "description": "A fully configurable HTTP/HTTPS proxy in Node.js",
   "main": "proxy.js",
   "bin": {
