@@ -269,5 +269,30 @@ export namespace utils {
     function generateRootCA(
       callback: (err: Error, keyPath: string) => void,
     ): void;
+
+    /** Get whether Root CA file exists. */
+    function isRootCAFileExists(): boolean;
+
+    /** Get whether Root CA certificate is trusted on this OS. */
+    function ifRootCATrusted(): boolean;
+
+    /**
+     * Get the Root directory path.
+     * Root directory is the path where certificates are stored.
+     */
+    function getRootDirPath(): string;
+
+    /**
+     * Get the Root CA file path.
+     * If the Root CA file does not exist, returns `""`;
+     */
+    function getRootCAFilePath(): string;
+
+    /**
+     * Clear all certificates in Root directory.
+     *
+     * @param callback Optional callback called when all certificates are cleared.
+     */
+    function clearCerts(callback?: () => any): void;
   }
 }
