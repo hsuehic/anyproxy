@@ -294,5 +294,7 @@ export namespace utils {
      * @param callback Optional callback called when all certificates are cleared.
      */
     function clearCerts(callback?: () => any): void;
+
+    function trustRootCA(): Promise<boolean>;
   }
 }
