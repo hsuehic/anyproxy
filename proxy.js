@@ -469,5 +469,5 @@ module.exports.ProxyWebServer = WebInterface;
 module.exports.utils = {
   systemProxyMgr: require('./lib/systemProxyMgr'),
   certMgr,
-  system: require('./lib/util'),
+  os: require('./lib/util'),
 };
