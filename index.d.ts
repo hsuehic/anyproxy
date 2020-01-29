@@ -11,6 +11,7 @@ import { IncomingMessage, ServerResponse, RequestOptions, Server } from 'http';
 import { EventEmitter } from 'events';
 
 import { Socket } from 'net';
+import { contentLength } from './lib/util';
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -296,5 +297,53 @@ export namespace utils {
     function clearCerts(callback?: () => any): void;
 
     function trustRootCA(): Promise<boolean>;
+  }
+
+  /**
+   * util methods for OS related operations
+   */
+  namespace os {
+    /**
+     * Get corresponding content-type of the file
+     * @param filepath {string}
+     */
+    function contentType(filepath: string): string;
+
+    /**
+     * get file size(unit: byte)
+     * @param filepath {number}
+     */
+    function contentLength(filepath: string): number;
+
+    /*
+    * remove the cache before requiring, the path SHOULD BE RELATIVE TO UTIL.JS
+    */
+    function freshRequire(modulePath): void;
+
+    /**
+     * get all ip addresses of current machine
+     */
+    function getAllIpAddress(): string[];
+
+    /**
+     * get valid port
+     */
+    function getFreePort(): Promise<number>;
+
+    /**
+     * whether a domain is IP
+     * @param ip {string} 
+     */
+    function isIp(ip: string): boolean;
+
+    /**
+     * execute cmd synchronously
+     * @param cmd {string}
+     */
+    function execScriptSync(cmd: string): {
+      stdout: string,
+      status: number,
+    };
+
   }
 }
