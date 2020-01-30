@@ -123,6 +123,7 @@ export interface RecorderInfo {
   id: number;
   url: string;
   host: string;
+  hosts: string[];
   path: string;
   method: string;
 

@@ -36,6 +36,7 @@ class ProxyCore extends events.EventEmitter {
    * @param {object} [config.rule=null] - rule module to use
    * @param {string} [config.type=http] - type of the proxy server, could be 'http' or 'https'
    * @param {strign} [config.hostname=localhost] - host name of the proxy server, required when this is an https proxy
+   * @param {string[]} [config.hosts=[]] - requests to this hosts would be handled as request to the config webserver. 
    * @param {number} [config.throttle] - speed limit in kb/s
    * @param {boolean} [config.forceProxyHttps=false] - if proxy all https requests
    * @param {boolean} [config.silent=false] - if keep the console silent
@@ -59,6 +60,9 @@ class ProxyCore extends events.EventEmitter {
     this.proxyHostName = config.hostname || 'localhost';
     this.recorder = config.recorder;
     this.currentHosts = util.getAllIpAddress().map(ip => `${ip}:${this.proxyPort}`).concat(`localhost:${this.proxyPort}`, `${this.proxyHostName}:${this.proxyPort}`);
+    if (config.hosts) {
+      this.currentHosts.concat(config.hosts);
+    }
 
     if (parseInt(process.versions.node.split('.')[0], 10) < 4) {
       throw new Error('node.js >= v4.x is required for anyproxy');
@@ -157,9 +161,12 @@ class ProxyCore extends events.EventEmitter {
   handleUserRequest(req, res) {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
-    if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
+    const url = new URL(req.url);
+    // eslint-disable-next-line no-nested-ternary
+    const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+    if (this.currentHosts.includes(host)) {
       if (this.requestListener) {
-        this.requestHandler(req, res);
+        this.requestListener(req, res);
       } else {
         res.write('Hello world');
         res.end();
@@ -413,7 +420,10 @@ class ProxyServer extends ProxyCore {
   handleUserRequest(req, res) {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
-    if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
+    const url = new URL(req.url);
+    // eslint-disable-next-line no-nested-ternary
+    const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+    if (this.currentHosts.includes(host)) {
       if (this.requestListener) {
         this.requestListener(req, res);
       } else if (this.webServerApp) {
