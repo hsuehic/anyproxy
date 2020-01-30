@@ -275,7 +275,7 @@ export namespace utils {
     function isRootCAFileExists(): boolean;
 
     /** Get whether Root CA certificate is trusted on this OS. */
-    function ifRootCATrusted(): boolean;
+    function ifRootCATrusted(callback: (error: Error, isTrusted: boolean) => void);
 
     /**
      * Get the Root directory path.
