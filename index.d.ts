@@ -275,7 +275,7 @@ export namespace utils {
     function isRootCAFileExists(): boolean;
 
     /** Get whether Root CA certificate is trusted on this OS. */
-    function ifRootCATrusted(callback: (error: Error, isTrusted: boolean) => void);
+    function ifRootCATrusted(callback: (error: Error, isTrusted: boolean) => void): void;
 
     /**
      * Get the Root directory path.
@@ -326,7 +326,7 @@ export namespace utils {
     /*
     * remove the cache before requiring, the path SHOULD BE RELATIVE TO UTIL.JS
     */
-    function freshRequire(modulePath): void;
+    function freshRequire(modulePath: string): void;
 
     /**
      * get all ip addresses of current machine
