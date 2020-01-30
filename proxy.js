@@ -43,6 +43,7 @@ class ProxyCore extends events.EventEmitter {
    * @param {object} [config.recorder] - recorder to use
    * @param {boolean} [config.wsIntercept] - whether intercept websocket
    * @param {http.Server} [config.httpProxyServer] - optional. using extra http server for proxy server
+   * @param {http.RequestListener} [config.requestListener] - optional. current http application
    *
    * @memberOf ProxyCore
    */
@@ -87,6 +88,7 @@ class ProxyCore extends events.EventEmitter {
     }
 
     this.httpProxyServer = config.httpProxyServer;
+    this.requestListener = config.requestListener;
     this.requestHandler = null;
 
     // copy the rule to keep the original proxyRule independent
@@ -156,8 +158,12 @@ class ProxyCore extends events.EventEmitter {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
     if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
-      res.write('Hello world');
-      res.end();
+      if (this.requestListener) {
+        this.requestHandler(req, res);
+      } else {
+        res.write('Hello world');
+        res.end();
+      }
     }
   }
 

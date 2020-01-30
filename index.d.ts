@@ -6,12 +6,11 @@
 
 /// <reference types="node" />
 
-import { IncomingMessage, ServerResponse, RequestOptions, Server } from 'http';
+import { IncomingMessage, ServerResponse, RequestOptions, Server, RequestListener } from 'http';
 
 import { EventEmitter } from 'events';
 
 import { Socket } from 'net';
-import { contentLength } from './lib/util';
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -41,6 +40,7 @@ export interface ProxyOptions {
   /** Recorder to use */
   recorder?: ProxyRecorder;
   httpProxyServer?: Server; // optional. if undefined using default http server for proxy server
+  requestListener?: RequestListener;
 }
 
 export interface WebInterfaceOptions {
