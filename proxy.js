@@ -414,7 +414,9 @@ class ProxyServer extends ProxyCore {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
     if (this.currentHosts.some(h => h.indexOf(req.headers.host) > -1)) {
-      if (this.webServerApp) {
+      if (this.requestListener) {
+        this.requestHandler(req, res);
+      } else if (this.webServerApp) {
         this.webServerApp(req, res);
       } else {
         res.write('Hello world');
