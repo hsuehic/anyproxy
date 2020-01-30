@@ -297,6 +297,14 @@ export namespace utils {
     function clearCerts(callback?: () => any): void;
 
     function trustRootCA(): Promise<boolean>;
+
+    /**
+     * Get status of root CA
+     */
+    function getCAStatus(): {
+      exist: boolean;
+      trusted?: boolean;
+    };
   }
 
   /**
