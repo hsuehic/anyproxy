@@ -103,7 +103,6 @@ class ProxyCore extends events.EventEmitter {
     }
 
     if (config.throttle) {
-      logUtil.printLog('throttle :' + config.throttle + 'kb/s');
       const rate = parseInt(config.throttle, 10);
       if (rate < 1) {
         throw new Error(
