@@ -162,10 +162,15 @@ class ProxyCore extends events.EventEmitter {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
     try {
-      const url = new URL(req.url);
-      // eslint-disable-next-line no-nested-ternary
-      const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
-      if (this.currentHosts.includes(host)) {
+      const reg = /^http(s)?:/;
+      let isReqToCurrentServer = !reg.test(req.url);
+      if (!isReqToCurrentServer) {
+        const url = new URL(req.url);
+        // eslint-disable-next-line no-nested-ternary
+        const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+        isReqToCurrentServer = this.currentHosts.includes(host)
+      }
+      if (isReqToCurrentServer) {
         if (this.requestListener) {
           this.requestListener(req, res);
         } else {
@@ -174,6 +179,7 @@ class ProxyCore extends events.EventEmitter {
         }
       }
     } catch (ex) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
       res.write('Proxy server error, please contact the <a href="https://mattermost.garenanow.com/sea/messages/@xiaowei.xue">@xiaowei.xue</a>');
       res.end();
     }
@@ -426,10 +432,15 @@ class ProxyServer extends ProxyCore {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
     try {
-      const url = new URL(req.url);
-      // eslint-disable-next-line no-nested-ternary
-      const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
-      if (this.currentHosts.includes(host)) {
+      const reg = /^http(s)?:/;
+      let isReqToCurrentServer = !reg.test(req.url);
+      if (!isReqToCurrentServer) {
+        const url = new URL(req.url);
+        // eslint-disable-next-line no-nested-ternary
+        const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+        isReqToCurrentServer = this.currentHosts.includes(host)
+      }
+      if (isReqToCurrentServer) {
         if (this.requestListener) {
           this.requestListener(req, res);
         } else if (this.webServerApp) {
@@ -440,6 +451,7 @@ class ProxyServer extends ProxyCore {
         }
       }
     } catch (ex) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
       res.write('Proxy server error, please contact the <a href="https://mattermost.garenanow.com/sea/messages/@xiaowei.xue">@xiaowei.xue</a>');
       res.end();
     }
