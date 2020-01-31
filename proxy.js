@@ -161,16 +161,21 @@ class ProxyCore extends events.EventEmitter {
   handleUserRequest(req, res) {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
-    const url = new URL(req.url);
-    // eslint-disable-next-line no-nested-ternary
-    const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
-    if (this.currentHosts.includes(host)) {
-      if (this.requestListener) {
-        this.requestListener(req, res);
-      } else {
-        res.write('Hello world');
-        res.end();
+    try {
+      const url = new URL(req.url);
+      // eslint-disable-next-line no-nested-ternary
+      const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+      if (this.currentHosts.includes(host)) {
+        if (this.requestListener) {
+          this.requestListener(req, res);
+        } else {
+          res.write('Hello world');
+          res.end();
+        }
       }
+    } catch (ex) {
+      res.write('Proxy server error, please contact the <a href="https://mattermost.garenanow.com/sea/messages/@xiaowei.xue">@xiaowei.xue</a>');
+      res.end();
     }
   }
 
@@ -420,18 +425,23 @@ class ProxyServer extends ProxyCore {
   handleUserRequest(req, res) {
     logUtil.info(`received request to: ${req.method} ${req.url}`);
     // proxy request start with http(s)://
-    const url = new URL(req.url);
-    // eslint-disable-next-line no-nested-ternary
-    const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
-    if (this.currentHosts.includes(host)) {
-      if (this.requestListener) {
-        this.requestListener(req, res);
-      } else if (this.webServerApp) {
-        this.webServerApp(req, res);
-      } else {
-        res.write('Hello world');
-        res.end();
+    try {
+      const url = new URL(req.url);
+      // eslint-disable-next-line no-nested-ternary
+      const host = url.hostname + (url.port ? ':' + url.port : util.isIp(url.hostname) ? ':80' : ''); // do not append port when hostname is not ip.
+      if (this.currentHosts.includes(host)) {
+        if (this.requestListener) {
+          this.requestListener(req, res);
+        } else if (this.webServerApp) {
+          this.webServerApp(req, res);
+        } else {
+          res.write('Hello world');
+          res.end();
+        }
       }
+    } catch (ex) {
+      res.write('Proxy server error, please contact the <a href="https://mattermost.garenanow.com/sea/messages/@xiaowei.xue">@xiaowei.xue</a>');
+      res.end();
     }
   }
 
