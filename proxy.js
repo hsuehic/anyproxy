@@ -405,7 +405,7 @@ class ProxyServer extends ProxyCore {
    */
   constructor(config) {
     // prepare a recorder
-    const recorder = new Recorder();
+    const recorder = config.recorder || new Recorder();
     const configForCore = Object.assign(
       {
         recorder,
@@ -473,6 +473,7 @@ class ProxyServer extends ProxyCore {
     } else {
       super.start();
     }
+    return this.recorder;
   }
 
   close() {

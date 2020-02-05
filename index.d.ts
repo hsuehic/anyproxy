@@ -168,7 +168,7 @@ export class ProxyCore extends EventEmitter {
 
 export class ProxyServer extends ProxyCore {
   constructor(config?: ProxyOptions);
-
+  public recorder: ProxyRecorder;
   /** Emit when proxy server is ready */
   on(eventName: 'ready', listener: () => void): this;
   /** Emit when error happened inside proxy server */
